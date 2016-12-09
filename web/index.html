@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <input type="text" id="nombre"/>
+        <select id="departamentos">
+            <option> Seleccione uno </option>
+        </select>
+        <select id="Municipios">
+            <option> Seleccione uno </option>
+        </select>
+        <button onclick="guardar()">Guardar</button>
+    </br>
+    </br>
+        <table id="personas">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Departamento</th>
+                    <th>Municipio</th>
+                </tr>
+                
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+        
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script>
+            //cuando el documento ya cargo
+            $(document).ready(function(){
+                $.get("dep",{f:"getDepartamentos"},function(res){
+                    for(var i = 0; i<res.length ; i++){
+                        var o = res[i];
+                        $("#departamentos").append("<option>"+o+"</option>");
+                    }
+                });
+                $.get("dep",{f:"getPersonas"},function(res){
+                    
+                    for(var i = 0; i<res.length ; i++){
+                        var o = res[i];
+                        var tr = "<tr>";
+                        var tr2 = "</tr>";
+                        var td = "<td>";
+                        var td2 = "</td>";
+                        
+                        var linea = tr + td + o.nombre + td2 +
+                                td + o.departamento + td2 +
+                                td + o.municipio + td2 + tr2;
+                        
+                        $("#personas tbody").append(linea);
+                    }
+                });
+                
+                $("#departamentos").change(function(){
+                   var texto = $(this).val();
+                   $.get("dep",{f:"getMunicipios", d:texto},function(res){
+                        res = res.municipios;
+                        $("#Municipios").html("");
+                        for(var i = 0; i<res.length ; i++){
+                            var o = res[i];
+                            
+                            $("#Municipios").append("<option>"+o+"</option>");
+                        }
+                    });
+                });
+            });
+            //
+            
+            
+            function guardar(){
+                var obj = {};
+                obj.f = "agregarPersona";
+                obj.nombre = $("#nombre").val();
+                obj.departamento = $("#departamentos").val();
+                obj.municipio = $("#Municipios").val();
+                
+                $.get("dep",obj,function(res){
+                        var tr = "<tr>";
+                        var tr2 = "</tr>";
+                        var td = "<td>";
+                        var td2 = "</td>";
+                        
+                        var linea = tr + td + obj.nombre + td2 +
+                                td + obj.departamento + td2 +
+                                td + obj.municipio + td2 + tr2;
+                    $("#personas tbody").prepend(linea);
+                });
+                
+            }
+        </script>
+    </body>
+</html>
